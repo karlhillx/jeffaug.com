@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "Access to /jeffaug/editor"
+AuthUserFile /kunden/homepages/39/d427029161/htpasswd
+Require user jeff
