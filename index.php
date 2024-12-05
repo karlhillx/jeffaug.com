@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php
@@ -8,7 +11,7 @@ include 'includes/sections/head.php';
     <div class="container-fluid">
         <?php
         include 'includes/sections/header.php';
-        include 'includes/sections/intro.php';
+        include 'includes/sections/hero.php';
         include 'includes/sections/tour-dates.php';
         include 'includes/sections/discography.php';
         include 'includes/sections/videos.php';
@@ -18,8 +21,8 @@ include 'includes/sections/head.php';
         include 'includes/sections/newsletter.php';
         include 'includes/sections/contact.php';
         include 'includes/sections/footer.php';
+        include 'includes/sections/schema.php';
         ?>
-
     </div>
 </div>
 
