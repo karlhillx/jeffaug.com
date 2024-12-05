@@ -1,4 +1,4 @@
-<!-- Newsletter CTA -->
+
 <div class="bg-gray-800">
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center">
         <div class="lg:w-0 lg:flex-1">
@@ -11,21 +11,34 @@
                 well as special ticketing offers and invitations to pre-release events.</p>
         </div>
         <div class="mt-8 lg:mt-0 lg:ml-8">
-            <form class="sm:flex" action="/forms/newsletter.php" method="post">
+            <form class="sm:flex" action="/forms/newsletter.php" method="post" id="newsletter-form">
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                 <label for="emailAddress" class="sr-only">Email address</label>
-                <input id="emailAddress" name="email" size="50" type="email" autocomplete="email" required
+                   <input
+                       id="emailAddress"
+                       name="email"
+                       type="email"
+                       required
+                       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                       title="Please enter a valid email address"
+                       aria-required="true"
+                       aria-describedby="email-error"
                        class="w-full px-5 py-3 border border-transparent placeholder-gray-500 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white focus:border-white sm:max-w-xs rounded-md"
                        placeholder="Enter your email">
-                <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
-                    <button type="submit" value="Subscribe"
+                   <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
+                       <button type="submit" id="subscribe-btn"
                             class="w-full flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500">
-                        Notify me
+                        <span class="default-text">Notify me</span>
+                        <span class="loading-text hidden">Subscribing...</span>
                     </button>
                 </div>
             </form>
-            <p class="mt-3 text-sm text-gray-300">
-                We care about the protection of your data. Please sign-up now!
-            </p>
+            <div class="mt-3">
+                <input type="checkbox" id="gdpr-consent" name="gdpr-consent" required>
+                <label for="gdpr-consent" class="text-sm text-gray-300">
+                    I consent to receiving newsletter emails and understand I can unsubscribe at any time.
+                </label>
+            </div>
         </div>
     </div>
 </div>
@@ -55,9 +68,6 @@
             </defs>
             <rect width="404" height="784" fill="url(#56409614-3d62-4985-9a10-7ca758a8f4f0)"/>
         </svg>
-
-        <div class="relative lg:flex lg:items-center">
-
 
             <div class="relative lg:ml-10">
                 <svg
@@ -116,3 +126,64 @@
         </div>
     </div>
 </section>
+<div role="alert" id="form-message" class="mt-3 hidden">
+    <p class="success-message text-green-500 hidden" role="status">Successfully subscribed!</p>
+    <p class="error-message text-red-500 hidden" role="alert">Error subscribing. Please try again.</p>
+</div>
+<form class="sm:flex" action="/forms/newsletter.php" method="post" id="newsletter-form">
+<script>
+document.getElementById('newsletter-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const button = document.getElementById('subscribe-btn');
+    const defaultText = button.querySelector('.default-text');
+    const loadingText = button.querySelector('.loading-text');
+
+    defaultText.classList.add('hidden');
+    loadingText.classList.remove('hidden');
+
+    fetch(this.action, {
+        method: 'POST',
+        body: new FormData(this)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messageDiv = document.getElementById('form-message');
+        const successMsg = messageDiv.querySelector('.success-message');
+        const errorMsg = messageDiv.querySelector('.error-message');
+
+        messageDiv.classList.remove('hidden');
+        if(data.success) {
+            successMsg.classList.remove('hidden');
+            errorMsg.classList.add('hidden');
+        } else {
+            errorMsg.classList.remove('hidden');
+            successMsg.classList.add('hidden');
+        }
+    })
+    .catch(error => {
+        const messageDiv = document.getElementById('form-message');
+        const errorMsg = messageDiv.querySelector('.error-message');
+        errorMsg.textContent = 'Network error. Please try again later.';
+        messageDiv.classList.remove('hidden');
+        errorMsg.classList.remove('hidden');
+    })
+    .finally(() => {
+        defaultText.classList.remove('hidden');
+        loadingText.classList.add('hidden');
+    });
+});
+</script>
+
+document.getElementById('subscribe-btn').addEventListener('click', function(e) {
+    if (!document.getElementById('gdpr-consent').checked) {
+        e.preventDefault();
+        document.querySelector('.error-message').textContent = 'Please accept the privacy policy';
+        document.querySelector('.error-message').classList.remove('hidden');
+    }
+});
+
+if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+    echo json_encode(['success' => false, 'message' => 'Invalid email format']);
+    exit;
+}
+
