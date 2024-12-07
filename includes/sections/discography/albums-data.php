@@ -4,8 +4,8 @@ return [
         'title' => 'Kiss of the Liquid Moon',
         'year' => '2024',
         'image' => 'img/release-kiss-liquid-moon.png',
-        'apple_music' => '#',
-        'spotify' => '#',
+        'apple_music' => 'https://music.apple.com/us/album/kiss-of-the-liquid-moon/1716835432',
+        'spotify' => 'https://open.spotify.com/album/0Jywfy0BlE63Do2KkMryy4?si=M7Y75OWjTEuc3cKBGS1SQQ',
         'is_coming_soon' => true
     ],
     [
